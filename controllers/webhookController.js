@@ -71,19 +71,22 @@ const keywords = await Keyword.find({
       const keyword = matchKeyword(text, keywords);
 
       if (keyword) {
-        console.log(
-          "Keyword topildi:",
-          keyword.keyword
-        );
+  console.log("Keyword topildi:", keyword.keyword);
 
-        await sendInstagramMessage(
-  senderId,
-  keyword.response,
-  business.accessToken
-);
-      } else {
-        console.log("Keyword topilmadi");
-      }
+  await sendInstagramMessage(
+    senderId,
+    keyword.response,
+    business.accessToken
+  );
+} else {
+  console.log("Keyword topilmadi, avto javob yuborildi");
+
+  await sendInstagramMessage(
+    senderId,
+    "Assalomu alaykum, bu avto javob edi",
+    business.accessToken
+  );
+}
     } catch (error) {
       console.error(
         "Keyword tekshirish xatosi:",

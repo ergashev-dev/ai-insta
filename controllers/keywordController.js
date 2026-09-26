@@ -1,19 +1,29 @@
 const Keyword = require("../models/keyword");
+const Business = require("../models/business");
 
 // Yangi keyword qo'shish
 const createKeyword = async (req, res) => {
   try {
-    const { keyword, response } = req.body;
+    const { businessId, keyword, response } = req.body;
 
-    if (!keyword || !response) {
+    if (!businessId || !keyword || !response) {
       return res.status(400).json({
-        message: "Keyword va response kiritilishi kerak",
+        message: "businessId, keyword va response kiritilishi kerak",
+      });
+    }
+
+    const business = await Business.findById(businessId);
+
+    if (!business) {
+      return res.status(404).json({
+        message: "Business topilmadi",
       });
     }
 
     const newKeyword = await Keyword.create({
-      keyword,
-      response,
+      business: business._id,
+      keyword: keyword.trim().toLowerCase(),
+      response: response.trim(),
     });
 
     return res.status(201).json({
@@ -29,10 +39,20 @@ const createKeyword = async (req, res) => {
   }
 };
 
-// Barcha keywordlarni olish
+// Business keywordlarini olish
 const getKeywords = async (req, res) => {
   try {
-    const keywords = await Keyword.find().sort({
+    const { businessId } = req.query;
+
+    if (!businessId) {
+      return res.status(400).json({
+        message: "businessId kiritilishi kerak",
+      });
+    }
+
+    const keywords = await Keyword.find({
+      business: businessId,
+    }).sort({
       createdAt: -1,
     });
 
@@ -62,7 +82,7 @@ const updateKeyword = async (req, res) => {
         }),
 
         ...(response && {
-          response,
+          response: response.trim(),
         }),
       },
       {
@@ -82,10 +102,7 @@ const updateKeyword = async (req, res) => {
       data: updatedKeyword,
     });
   } catch (error) {
-    console.error(
-      "Keyword yangilash xatosi:",
-      error.message
-    );
+    console.error("Keyword yangilash xatosi:", error.message);
 
     return res.status(500).json({
       message: "Server xatosi",
@@ -144,10 +161,7 @@ const deleteKeyword = async (req, res) => {
       message: "Tezkor so'z o'chirildi ✅",
     });
   } catch (error) {
-    console.error(
-      "Keyword o'chirish xatosi:",
-      error.message
-    );
+    console.error("Keyword o'chirish xatosi:", error.message);
 
     return res.status(500).json({
       message: "Server xatosi",
