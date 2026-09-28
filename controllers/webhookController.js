@@ -80,12 +80,6 @@ const keywords = await Keyword.find({
   );
 } else {
   console.log("Keyword topilmadi, avto javob yuborildi");
-
-  await sendInstagramMessage(
-    senderId,
-    "Assalomu alaykum, bu avto javob edi",
-    business.accessToken
-  );
 }
     } catch (error) {
       console.error(
